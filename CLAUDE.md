@@ -2,6 +2,8 @@
 
 Handoff from a claude.ai chat. Read this fully before doing anything. The goal is to WIN this hackathon.
 
+> **Product plan update (12:20 PM):** the product is now **Sidecar** as described in [docs/PLAN.md](docs/PLAN.md): live "ask the talk" + matching people on what they're stuck on + a smart schedule. **docs/PLAN.md supersedes §5 (Conference Galaxy), §7 (roadmap) and §8 (demo script) below.** Sections 1–4, 6, 9 and 10 (rules, tracks, sponsor facts, setup, working agreements) still apply.
+
 ## 1. Situation
 
 - Project name: **Sidecar**. Use this name in the README, UI, repo docs and demo.
