@@ -139,6 +139,7 @@ How each sponsor is used (this is what the judges check):
 ## 10. Working agreements for the Claude CLI session
 
 - Work in small feature branches; open a PR for each feature; let Gitar review; merge only after review. Many small PRs spread across the day, never one big PR at the end.
+- Commit incrementally: commit after each small working step (a file, a fix, a config change), with a clear message, and push the feature branch often. Never batch a lot of work into one commit. Gitar and the judges look at commit and PR history.
 - Keep a running EVIDENCE.md with timestamps/screenshots/links for each sponsor story (Gitar fix, Radar investigation, Dash0 finding) to make the demo easy.
 - Keep the README accurate as things change, and keep the AI-use disclosure section in it.
 - The humans must be able to explain every part of the code. Prefer simple, readable code over clever code, and explain decisions as you go. Add short comments for the non-obvious bits.
