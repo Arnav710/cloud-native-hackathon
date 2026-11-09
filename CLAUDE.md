@@ -4,6 +4,8 @@ Handoff from a claude.ai chat. Read this fully before doing anything. The goal i
 
 ## 1. Situation
 
+- Project name: **Sidecar**. Use this name in the README, UI, repo docs and demo.
+
 - Event: Cloud Native Hackathon by WeMakeDevs, in person, The Shop Workspace, 350 E 400 S, Salt Lake City. Monday Nov 9, 2026. Free entry. Theme: "Build anything that makes conferences better."
 - Hackathon pages (fetch these with WebFetch if you need details):
   - Overview: https://www.wemakedevs.org/hackathons/cnh
