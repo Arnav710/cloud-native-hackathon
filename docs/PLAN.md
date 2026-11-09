@@ -2,6 +2,10 @@
 
 **One line:** Ask the talk anything, live. The people stuck on the same thing become your hallway track.
 
+**The core promise: every introduction comes with the conversation already started.** The most valuable part of a conference is talking to people, but many attendees are introverts, don't know how to open, and end up in forgettable "so what do you do?" chats. Sidecar introduces you to people *because* you share a real problem, so you never start from zero: you already know what to talk about, why it matters to both of you, and what each of you can offer. Easier to start, more valuable, more memorable. Every networking feature below (matching, blind profiles, schedule twins, meetups) exists to serve this promise.
+
+> Technical design: [ARCHITECTURE.md](ARCHITECTURE.md).
+
 **Team:** 3 people. **Build:** ~12:15 → 3:15 (3h). **Demo prep:** 3:15 → 5:00. **Hard deadline:** 5:30 PM MT (we target 5:00).
 
 ---
@@ -98,6 +102,23 @@ Everything you do updates **one interest profile** per person, and every ranking
 
 ---
 
+## 1c+. The conversation kit (what every match reveals)
+When a match is mutual, both people get the same **conversation kit**, so starting is effortless:
+- **Why you two:** "You're both trying to cut tracing costs without losing error traces."
+- **Your opener:** one natural first line ("I saw you asked about tail sampling too. Did you try it in the collector yet?")
+- **Two follow-up questions** drawn from what each of you asked and starred
+- **What each of you brings:** "They've migrated 150 services to OTel; you've tuned collector memory" (from profiles and "working on")
+- **Where and when:** the smart meetup suggestion (§1d-C)
+- **After:** one tap, "Was this worth it?", which feeds matching quality and the recap
+
+## 1c++. "I'm lost" and "Got it": one-tap signals during a talk
+Typing a question is effort. A single tap is not.
+- **"I'm lost"** (one tap) timestamps the moment you got confused. You instantly get **"Explain the last 30 seconds"**, simplified to *your* level (from your profile). No typing, no raising your hand.
+- **"Got it"** (one tap) marks a moment that clicked. It's the positive signal speakers rarely get.
+- Both are stored as `signals` (talk, offset in seconds, type, anonymous user hash).
+- **For the speaker:** the per-minute **confusion map** (lost vs. got-it vs. questions over the talk's timeline, with the transcript at each spike) is the backbone of the AI speaker report (§1d-E).
+- **For matching:** a weak signal only. Being lost at the same moment isn't enough to meet, but it adds to a match that already shares a real problem.
+
 ## 1d. Features that fix the researched problems (v2)
 
 Each feature maps to a problem in [research/all-conferences-problems.md](research/all-conferences-problems.md). "Star" and "catch me up" stay as small helpers, not headline features.
@@ -137,7 +158,7 @@ Each feature maps to a problem in [research/all-conferences-problems.md](researc
 **Problem:** speakers get almost no feedback ("a letter into the void"); attendees rarely give honest feedback in person.
 - After the talk (and at the end of the conference), each speaker gets a private page:
   - **Every question asked during their talk**, anonymized and **clustered by theme** ("12 questions about sampling, 5 about cost")
-  - **Confusion timeline**: questions per minute, with the transcript at each spike ("minute 14: 9 questions right after you said 'tail-based sampling'")
+  - **Confusion map**: "I'm lost" taps, "Got it" taps and questions per minute, with the transcript at each spike ("minute 14: 9 questions right after you said 'tail-based sampling'")
   - **Audience mix** (aggregated only): roles, levels, why they came ("60% advanced, mostly here to solve a problem")
   - **Anonymous feedback**: a 2-tap rating + an optional comment from attendees
   - **AI suggestions for next time**: "Define tail sampling before minute 14", "Many beginners attended; add a 1-slide primer"
@@ -285,7 +306,7 @@ All on Kubernetes (Radar cluster, Argo deploys) · OTel → Dash0 · PRs → Git
 | 12:45–1:45 | Ingest svc → transcription → `transcripts`; live captions (SSE); ask box; ⭐ star | `ask` API (hybrid search: this talk → all talks, LLM answer with timestamps); question classifier; schedule search + recommend | Onboarding/profile page; My Schedule page + QR per talk; deploy all services to k8s |
 | 1:45–2:45 | Follow-topic UI + alert toasts; Room B **replay script** | Percolator alerts; **matcher** (score formula) → `matches`; recap query + LLM | **Connect page**: live graph (react-force-graph / d3) + blind profile cards + mutual reveal |
 | 2:45–3:15 | Speaker timeline view; polish live page | Recap page data + export; activity events everywhere | Integration, deploy, Dash0 dashboard + **SLOs**, Radar check |
-| 3:15–5:00 | **All:** inject a real bug → find it with Agent0 + Radar → fix through a Gitar-reviewed PR · rehearse demo ×3 · README (setup, architecture, AI disclosure, per-track section) · screenshots · submit by 5:00 | | |
+| 3:15–5:00 | **All:** find a *real* issue in the running app (or run an investigation after a release; Radar's rules say don't break things on purpose) with Agent0 + Radar → fix through a Gitar-reviewed PR · rehearse demo ×3 · README (setup, architecture, AI disclosure, per-track section) · screenshots · submit by 5:00 | | |
 
 **Rules for the team:**
 - **Every feature = its own branch + PR through Gitar.** No direct pushes to main. (The Gitar track scores this.)
