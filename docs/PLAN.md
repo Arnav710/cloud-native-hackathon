@@ -12,11 +12,12 @@
 |---|---|---|
 | **0. Onboard** | 60-second profile: name, role, years, company type, **"what I'm working on right now"**, **"what I want to get out of this conference"**, open-to-meet toggle | Supporting (10s) |
 | **1. Before: My Schedule** | Search talks in plain English ("cutting observability costs"), see "recommended for you" (from the profile), add to My Schedule. Every talk has a QR code / join link | Supporting (10s) |
-| **2. During: Live Talk** ⭐ | Scan QR → live captions → **ask anything privately**, answered from what the speaker just said → ⭐ star a moment → follow a topic | **HERO** |
-| **3. Connect** ⭐ | After the talk: **blind profiles** of people who were stuck on the same thing → mutual "want to meet" → reveal + huddle spot | **HERO** |
+| **2. During: Live Talk** ⭐ | Scan QR → live captions → **ask anything privately**, answered from what the speaker just said → **"Apply to my work"** on any moment → follow a topic → **"Where to go next"** for your question (a later talk, another conference) | **HERO** |
+| **3. Connect** ⭐ | **Blind profiles** of people stuck on the same problem, plus **schedule twins** → mutual "want to meet" → **smart meetup: place + time on the venue map, from both schedules** → both accept → it's on both schedules | **HERO** |
 | **4. Across rooms** | "Room B is talking about your topic right now" alerts; answers that cite other talks | Wow moment (10s) |
-| **5. After: My Recap** | Auto-built trip report: takeaways, people met and why, open questions, action items | Payoff (15s) |
-| **6. Speaker view** | Per-minute confusion timeline + top unanswered questions | Flash (5–10s) |
+| **5. After: Takeaway engine** | Not a summary: **GitHub issues drafted for your repo**, **ask the speaker later**, **follow-ups with context**, a **shareable "what I got" page** for your manager | Payoff (15s) |
+| **6. Speaker feedback hub** | After the conference: **every question asked, anonymous and clustered**, confusion timeline, audience mix, AI suggestions for next time, answer queued questions | Flash (10s) |
+| **Add-ons** | Multi-conference dashboard (Luma etc.), side-event suggestions, personalization upgrades | Only if time (see §9) |
 
 Phases 0–1 are small in the demo, but they're **smart**: they create the personal profile that everything else (schedule, matching, alerts, recap) uses.
 
@@ -94,6 +95,69 @@ Everything you do updates **one interest profile** per person, and every ranking
 5. **Recap** ties takeaways back to `working_on`.
 
 **The one-line pitch:** *Every tap teaches Sidecar what you care about, and every screen (your schedule, your alerts, your matches, your recap) gets smarter from it.*
+
+---
+
+## 1d. Features that fix the researched problems (v2)
+
+Each feature maps to a problem in [research/all-conferences-problems.md](research/all-conferences-problems.md). "Star" and "catch me up" stay as small helpers, not headline features.
+
+### A. "Apply to my work": turn a talk moment into action in *your* repo
+**Problem:** only 10–20% of conference learning reaches the workplace, and ~70% is forgotten within a day.
+- Tap **Apply to my work** on any moment (or on an answer). Sidecar combines what the speaker said + your GitHub summary + your "working on" text, and returns **what it means for you, specifically**:
+  > *"The speaker kept 100% of error traces with tail sampling. Your repo `payments-api` uses head sampling at 10% in `otel-collector.yaml`. Suggested change: add a `tail_sampling` processor with an error policy. [Draft GitHub issue]"*
+- **Draft GitHub issue** (title, context, the speaker's quote and timestamp, suggested steps) → one click opens it in your repo (prefilled `issues/new?title=&body=` link, so no write access is needed).
+- This is the cloud-native crowd's version of "takeaways": not notes, but **tickets**.
+- *Scope: one LLM call + a GitHub link. Reading actual repo files is a stretch; v1 uses the onboarding GitHub summary.*
+
+### B. Ask the speaker later
+**Problem:** Q&A time is "very limited" (CHI '25), and many people never ask in public.
+- Any question the talk didn't answer can be **sent to the speaker** (anonymous by default). It lands in the Speaker feedback hub (E). When the speaker answers, every attendee who asked something similar gets it.
+
+### C. Schedule twins + smart meetups on a venue map
+**Problem:** networking is the #1 goal and the worst served; matching on job titles fails; people don't know where or when to meet.
+- **Schedule twins:** "You and a platform engineer from e-commerce picked 4 of the same 6 talks (2 of them niche). You're both free at 11:30. Want to catch up?" Same blind card and mutual-reveal flow as "Same problem" matches.
+- **Venue map:** a simple floor plan (SVG) with rooms, coffee bars, lounges, a quiet room and the expo hall.
+- **Smart meetup suggestion** once a match is mutual:
+  1. **When:** the first gap where *both* schedules are free (≥15 min).
+  2. **Where:** the meeting spot closest to *both* people's next rooms, so neither walks across the venue. Skips spots that are crowded right now (from live check-in counts).
+  3. Shown on the map with a pin and both walking routes: *"11:35, Coffee bar Hall B: 2 min from your next talk, 3 min from theirs."*
+  4. Both accept → it's added to **both schedules** as a meetup block, with the opener.
+- **ES:** meeting spots and rooms are stored with `geo_point` coordinates (on a local grid mapped to fake lat/lon), and candidates are sorted with `geo_distance` from the midpoint of the two next rooms. This uses the **geo** feature Elastic listed on the resources page.
+- **Before the huddle:** "3 things to talk about with them" (shared problem, overlapping talks, what they're working on). This helps the ~34% who lack networking confidence.
+
+### D. "Where to go next" for every question
+**Problem:** choice overload, and questions that one talk can't fully answer.
+- When you ask, Sidecar also searches **upcoming talks in this conference** (`start_time > now`) and an **`events` index of other conferences**:
+  > *"Your question about eBPF security is the main topic of 'eBPF in Production' tomorrow at 10:00, Room D. [Add to schedule]"*
+  > *"Going deeper? KubeCon EU (Amsterdam, March) has 3 talks on this."*
+- One extra query on each ask (hybrid search on the question text, filtered by future time). Unanswered questions also feed the recap's **"still open → go here"** list.
+
+### E. Speaker feedback hub (anonymous)
+**Problem:** speakers get almost no feedback ("a letter into the void"); attendees rarely give honest feedback in person.
+- After the talk (and at the end of the conference), each speaker gets a private page:
+  - **Every question asked during their talk**, anonymized and **clustered by theme** ("12 questions about sampling, 5 about cost")
+  - **Confusion timeline**: questions per minute, with the transcript at each spike ("minute 14: 9 questions right after you said 'tail-based sampling'")
+  - **Audience mix** (aggregated only): roles, levels, why they came ("60% advanced, mostly here to solve a problem")
+  - **Anonymous feedback**: a 2-tap rating + an optional comment from attendees
+  - **AI suggestions for next time**: "Define tail sampling before minute 14", "Many beginners attended; add a 1-slide primer"
+  - **Answer queued questions** (from B), which go back to the askers
+- **ES:** `terms` + `date_histogram` aggregations over `questions`, filtered to the talk. Clustering = the topic field from the question classifier.
+- **Privacy:** never show who asked; hide any cluster with fewer than 3 people.
+
+### F. The recap becomes a "what I got" page (not a boring export)
+**Problem:** people must prove the trip was worth it, and only ~12% of connections get a meaningful follow-up.
+- A **shareable page** (a link, not a file) your manager can open: talks attended → **GitHub issues created** (from A) → people met and why → questions still open and where they'll be answered (from D).
+- **Follow-ups with context:** for each person you met, a drafted message that references your actual shared problem, plus a "remind me in 3 days" option.
+- **Memory nudges:** a 3-bullet "remember this" for the next morning and a week later, built from your saved moments and applied items (spaced recall against the forgetting curve). *Stretch.*
+
+### Priority inside v2 (if time is tight)
+1. **C** (schedule twins + map meetup), the best networking demo
+2. **E** (speaker hub), cheap since it's aggregations, and memorable
+3. **A** (apply to my work + GitHub issue), the strongest "wow" for this audience
+4. **D** (where to go next), one extra query
+5. **B** (ask the speaker later)
+6. **F** (what-I-got page)
 
 ---
 
@@ -207,7 +271,7 @@ All on Kubernetes (Radar cluster, Argo deploys) · OTel → Dash0 · PRs → Git
 
 **Stack (suggested, keep it boring):** Next.js (web, RUM) + one Node/TS or Python FastAPI `api` + `ingest` + `matcher` as small separate deployments (3 backend services = a better Radar/Dash0 story). Elastic Serverless (Elasticsearch project) with **`semantic_text`** (built-in embeddings, no vector code). OpenAI `gpt-4o-mini` + transcription model. Live updates via SSE or polling (no websockets needed).
 
-**ES indices:** `talks` (catalog, semantic_text on title/abstract) · `transcripts` (talk_id, room, ts, text: semantic_text) · `questions` (user, talk, ts, text, type, topic, problem: semantic_text) · `profiles` (role, yrs, company_type, working_on: semantic_text, goals) · `follows` (percolator field) · `activity` · `matches`.
+**ES indices:** `talks` (catalog, semantic_text on title/abstract) · `transcripts` (talk_id, room, ts, text: semantic_text) · `questions` (user, talk, ts, text, type, topic, problem: semantic_text) · `profiles` (role, yrs, company_type, working_on: semantic_text, goals) · `venue_spots` (rooms, coffee bars, lounges: `geo_point`, live crowd count) · `meetups` · `events` (other conferences and side events, for §1d-D and §9) · `follows` (percolator field) · `activity` · `matches`.
 
 **Seed data:** ~30 conference-style talks (titles/abstracts/rooms/times), ~25 fake attendees with profiles + questions, 1 pre-recorded talk transcript for Room B replay.
 
@@ -247,6 +311,7 @@ All on Kubernetes (Radar cluster, Argo deploys) · OTel → Dash0 · PRs → Git
 | 12:05 | Matching is never on definition questions alone; blind profiles with mutual reveal |
 | 12:10 | Schedule overlap (rarity-weighted) = a faint "same interests" graph layer |
 | 12:15 | Scheduler is smart (goal/level/pace-aware, explains every pick) but small in the demo |
+| 12:40 | v2 features added (§1d): apply-to-my-work + GitHub issue, ask the speaker later, schedule twins + venue-map meetups, where-to-go-next, speaker feedback hub, what-I-got page. Multi-conference dashboard and side events are add-ons (§9) |
 
 ## 8. Cut list (if behind at 2:45, cut from the bottom)
 1. Speaker timeline → static screenshot
@@ -254,3 +319,13 @@ All on Kubernetes (Radar cluster, Argo deploys) · OTel → Dash0 · PRs → Git
 3. "Been there" match type → "Same problem" only
 4. Cross-room answer citations → keep alerts only
 5. **Never cut:** live captions, ask, blind-profile matching, graph, one cross-room alert
+
+## 9. Add-ons (only if time; not the focus)
+Small, nice-to-have extras. Build none of these until the core flow and v2 priorities 1–3 work end to end.
+
+| Add-on | What it is | How (keep it cheap) |
+|---|---|---|
+| **Multi-conference dashboard** | A simple page listing upcoming conferences (KubeCon EU, local CNCF meetups and others) with "topics that match you" badges | Seed an `events` index from a static JSON of public event listings (Luma public event pages, CNCF calendar). No scraping behind logins; check each site's terms. The same index powers §1d-D "another conference covers this" |
+| **Side-event suggestions** | "There's a networking event tonight you might like" (meetups, after-parties, community huddles) | Same `events` index, ranked against your profile. Luma: only public events, imported via static JSON or its public pages/API where allowed. Slack: only channels the team owns, with permission; otherwise seed sample data |
+| **Personalization upgrades** | Learn more from behavior: dwell time, ignored alerts, rejected matches, `significant_terms` "people like you", re-planning the afternoon live | Already designed in §1c; turn on piece by piece |
+| **Memory nudges** | Next-morning and one-week "remember this" digests | A scheduled job + one LLM call per user |
