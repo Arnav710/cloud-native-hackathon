@@ -2,6 +2,8 @@
 
 **Ask the talk anything, live. The people stuck on the same thing become your hallway track.**
 
+The best part of a conference is the people, but starting a conversation with a stranger is hard, and most hallway chats are forgettable. Sidecar introduces you to people because you share a real problem, so **every introduction comes with the conversation already started**.
+
 Built at the Cloud Native Hackathon (WeMakeDevs, Salt Lake City, Nov 9 2026). Theme: *make conferences better.*
 
 ## What it does
@@ -15,6 +17,7 @@ Built at the Cloud Native Hackathon (WeMakeDevs, Salt Lake City, Nov 9 2026). Th
 ## Docs (start here)
 | Doc | What's in it |
 |---|---|
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | **The tech plan.** Stack, deployment on the Radar cluster, ES data model, API, flows, observability, CI and review, build order |
 | [docs/PLAN.md](docs/PLAN.md) | **The build plan.** Product flow, design decisions, ES personalization, demo script, architecture, team split, open questions |
 | [docs/HACKATHON_REQUIREMENTS.md](docs/HACKATHON_REQUIREMENTS.md) | Rules, tracks, judging criteria |
 | [docs/research/all-conferences-problems.md](docs/research/all-conferences-problems.md) | Researched problems across all conference types, with sources |
@@ -28,7 +31,7 @@ Elasticsearch (core data layer: hybrid search, semantic matching, percolator ale
 _TBD: filled in as services land._
 
 ## Architecture
-_TBD: see docs/PLAN.md §4 for the current design._
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## AI usage disclosure
 This project was built with AI coding assistants (Claude Code and others), as allowed by the hackathon rules. AI was used for research, planning, and code generation. All code is reviewed, understood and tested by the team, and every feature lands through a reviewed pull request.
